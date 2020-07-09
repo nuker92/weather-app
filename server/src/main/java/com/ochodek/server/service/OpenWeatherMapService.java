@@ -18,11 +18,7 @@ public class OpenWeatherMapService {
     @Value("${openweathermap.api-key}")
     private String apiKey;
 
-    private CityRepository cityRepository;
-
-    public OpenWeatherMapService() {
-        // empty
-    }
+    private final CityRepository cityRepository;
 
     @Autowired
     public OpenWeatherMapService(CityRepository cityRepository) {
