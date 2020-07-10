@@ -85,7 +85,7 @@
                 <configuration>
                     <appName>weather-app-go</appName>
                     <processTypes>
-                        <web>java -jar -Dserver.port=$PORT target/${project.build.finalName}.jar</web>
+                        <web>java -jar -Dserver.port=$PORT target/${project.build.finalName}.jar --openweathermap.api-key=${openweathermap.api}</web>
                     </processTypes>
                 </configuration>
             </plugin>
