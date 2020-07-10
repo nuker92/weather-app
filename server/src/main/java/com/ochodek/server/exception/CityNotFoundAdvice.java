@@ -21,14 +21,16 @@ public class CityNotFoundAdvice {
     }
 
     private String decodeStatusCodeToMessage(String cityName, HttpStatus statusCode) {
-        return switch (statusCode) {
-            case UNAUTHORIZED -> "Wrong api key to OpenWeatherMap, please try again later";
-            case NOT_FOUND -> String.format("City %s not found", cityName);
-            case TOO_MANY_REQUESTS -> "Too many requests to OpenWeatherMap, please try again later";
-            default -> {
+        switch (statusCode) {
+            case UNAUTHORIZED:
+                return "Wrong api key to OpenWeatherMap, please try again later";
+            case NOT_FOUND:
+                return String.format("City %s not found", cityName);
+            case TOO_MANY_REQUESTS:
+                return "Too many requests to OpenWeatherMap, please try again later";
+            default:
                 log.error(String.format("Unsupported error code %s, need to FIX it", statusCode.value()));
-                yield "Unsupported error code, please try again later";
-            }
-        };
+                return  "Unsupported error code, please try again later";
+        }
     }
 }

@@ -14,7 +14,7 @@
     <name>server</name>
 
     <properties>
-        <java.version>14</java.version>
+        <java.version>11</java.version>
         <openweathermap.api>api key to be passed via Jenkins</openweathermap.api>
     </properties>
 
@@ -85,7 +85,7 @@
                 <configuration>
                     <appName>weather-app-go</appName>
                     <processTypes>
-                        <web>java -jar -Dserver.port=$PORT target/${project.build.finalName}.jar --openweathermap.api-key=${openweathermap.api}</web>
+                        <web>java -jar -Dserver.port=$PORT target/${project.build.finalName}.jar</web>
                     </processTypes>
                 </configuration>
             </plugin>
