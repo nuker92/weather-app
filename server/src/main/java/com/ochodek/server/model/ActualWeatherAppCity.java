@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ochodek.server.model.inner.*;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class ActualWeatherAppCity {
+public class ActualWeatherAppCity implements Serializable {
 
     @JsonProperty("coord")
     private Coordinates coordinates;
@@ -27,7 +28,7 @@ public class ActualWeatherAppCity {
     private String name;
 
     @Data
-    public static class Sys {
+    public static class Sys implements Serializable{
         private String country;
         private Long sunrise;
         private Long sunset;

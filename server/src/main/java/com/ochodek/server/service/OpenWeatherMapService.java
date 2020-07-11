@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -35,10 +36,12 @@ public class OpenWeatherMapService {
         this.restTemplate = restTemplate;
     }
 
+    @Cacheable(cacheNames = "actualWeather")
     public ActualWeatherAppCity findActualByCityAndSaveToDatabase(String cityName) {
         String url = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", cityName, apiKey);
 
         try {
+            log.info("Requesting openweathermap to get wheather in " + cityName);
             ActualWeatherAppCity actualWeatherAppCity = restTemplate.getForObject(
                     url,
                     ActualWeatherAppCity.class);
@@ -49,10 +52,12 @@ public class OpenWeatherMapService {
         }
     }
 
+    @Cacheable(cacheNames = "forecast")
     public ForecastAppCity findForecastByCity(String cityName) {
         String url = String.format("https://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s", cityName, apiKey);
 
         try {
+            log.info("Requesting openweathermap to get forecast for " + cityName);
             return restTemplate.getForObject(
                     url,
                     ForecastAppCity.class);
