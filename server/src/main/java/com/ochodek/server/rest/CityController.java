@@ -1,6 +1,7 @@
 package com.ochodek.server.rest;
 
-import com.ochodek.server.model.WeatherAppCity;
+import com.ochodek.server.model.ActualWeatherAppCity;
+import com.ochodek.server.model.ForecastAppCity;
 import com.ochodek.server.service.OpenWeatherMapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +24,13 @@ public class CityController {
     }
 
     @GetMapping("/{cityName}")
-    public WeatherAppCity findWeather(@PathVariable String cityName) {
-        return openWeatherMapService.findByCityAndSaveToDatabase(cityName);
+    public ActualWeatherAppCity findWeather(@PathVariable String cityName) {
+        return openWeatherMapService.findActualByCityAndSaveToDatabase(cityName);
+    }
+
+    @GetMapping("/forecast/{cityName}")
+    public ForecastAppCity findForecast(@PathVariable String cityName) {
+        return openWeatherMapService.findForecastByCity(cityName);
     }
 
 

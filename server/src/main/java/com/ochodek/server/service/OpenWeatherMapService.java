@@ -3,7 +3,8 @@ package com.ochodek.server.service;
 import com.ochodek.server.entity.City;
 import com.ochodek.server.exception.OpenWeatherMapException;
 import com.ochodek.server.model.CountryCode;
-import com.ochodek.server.model.WeatherAppCity;
+import com.ochodek.server.model.ActualWeatherAppCity;
+import com.ochodek.server.model.ForecastAppCity;
 import com.ochodek.server.repository.CityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,29 +35,42 @@ public class OpenWeatherMapService {
         this.restTemplate = restTemplate;
     }
 
-    public WeatherAppCity findByCityAndSaveToDatabase(String cityName) {
+    public ActualWeatherAppCity findActualByCityAndSaveToDatabase(String cityName) {
         String url = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", cityName, apiKey);
 
         try {
-            WeatherAppCity weatherAppCity = restTemplate.getForObject(
+            ActualWeatherAppCity actualWeatherAppCity = restTemplate.getForObject(
                     url,
-                    WeatherAppCity.class);
-            saveCityIfNotExists(weatherAppCity);
-            return weatherAppCity;
+                    ActualWeatherAppCity.class);
+            saveCityIfNotExists(actualWeatherAppCity);
+            return actualWeatherAppCity;
         } catch (HttpStatusCodeException e) {
             throw new OpenWeatherMapException(cityName, e.getStatusCode());
         }
     }
 
-    private void saveCityIfNotExists(WeatherAppCity weatherAppCity) {
-        if (weatherAppCity != null &&
-                cityRepository.findByNameAndCountryCode(weatherAppCity.getName(), CountryCode.valueOf(weatherAppCity.getSys().getCountry()))
+    public ForecastAppCity findForecastByCity(String cityName) {
+        String url = String.format("https://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s", cityName, apiKey);
+
+        try {
+            return restTemplate.getForObject(
+                    url,
+                    ForecastAppCity.class);
+        } catch (HttpStatusCodeException e) {
+            throw new OpenWeatherMapException(cityName, e.getStatusCode());
+        }
+
+    }
+
+    private void saveCityIfNotExists(ActualWeatherAppCity actualWeatherAppCity) {
+        if (actualWeatherAppCity != null &&
+                cityRepository.findByNameAndCountryCode(actualWeatherAppCity.getName(), CountryCode.valueOf(actualWeatherAppCity.getSys().getCountry()))
                         .isEmpty()) {
             City city = new City();
-            city.setName(weatherAppCity.getName());
-            city.setCountryCode(CountryCode.valueOf(weatherAppCity.getSys().getCountry()));
-            city.setLongitude(weatherAppCity.getCoord().getLon());
-            city.setLatitude(weatherAppCity.getCoord().getLat());
+            city.setName(actualWeatherAppCity.getName());
+            city.setCountryCode(CountryCode.valueOf(actualWeatherAppCity.getSys().getCountry()));
+            city.setLongitude(actualWeatherAppCity.getCoordinates().getLongitude());
+            city.setLatitude(actualWeatherAppCity.getCoordinates().getLatitude());
             cityRepository.save(city);
             log.info(String.format("Successfully added City %s,%s", city.getName(), city.getCountryCode()));
         }

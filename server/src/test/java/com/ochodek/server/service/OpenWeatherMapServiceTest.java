@@ -3,7 +3,8 @@ package com.ochodek.server.service;
 import com.ochodek.server.entity.City;
 import com.ochodek.server.exception.OpenWeatherMapException;
 import com.ochodek.server.model.CountryCode;
-import com.ochodek.server.model.WeatherAppCity;
+import com.ochodek.server.model.ActualWeatherAppCity;
+import com.ochodek.server.model.inner.Coordinates;
 import com.ochodek.server.repository.CityRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,16 +40,19 @@ public class OpenWeatherMapServiceTest {
     private static final String EXISTING_CITY = "London";
     private static final String NOT_EXISTING_CITY = "asdads";
 
+    private static final Double COMMON_LONGITUDE = 0D;
+    private static final Double COMMON_LATITUDE = 0D;
+
     @Test
     @DisplayName("Everything is all right, and city doesn't exists")
     public void findByCityAndSaveToDatabase_case1() {
-        WeatherAppCity createdWeather = createWeatherAppCity(EXISTING_CITY, CountryCode.GB);
+        ActualWeatherAppCity createdWeather = createWeatherAppCity(EXISTING_CITY, CountryCode.GB);
 
-        when(restTemplate.getForObject(anyString(), eq(WeatherAppCity.class)))
+        when(restTemplate.getForObject(anyString(), eq(ActualWeatherAppCity.class)))
                 .thenReturn(createdWeather);
         when(cityRepository.findByNameAndCountryCode(anyString(), any(CountryCode.class)))
                 .thenReturn(Optional.empty());
-        WeatherAppCity weatherReturnedByApp = openWeatherMapService.findByCityAndSaveToDatabase(EXISTING_CITY);
+        ActualWeatherAppCity weatherReturnedByApp = openWeatherMapService.findActualByCityAndSaveToDatabase(EXISTING_CITY);
 
         assertEquals(createdWeather.getName(), weatherReturnedByApp.getName());
         verify(cityRepository).findByNameAndCountryCode(anyString(), any(CountryCode.class));
@@ -58,13 +62,13 @@ public class OpenWeatherMapServiceTest {
     @Test
     @DisplayName("Everything is all right, and city exists")
     public void findByCityAndSaveToDatabase_case2() {
-        WeatherAppCity createdWeather = createWeatherAppCity(EXISTING_CITY, CountryCode.GB);
+        ActualWeatherAppCity createdWeather = createWeatherAppCity(EXISTING_CITY, CountryCode.GB);
 
-        when(restTemplate.getForObject(anyString(), eq(WeatherAppCity.class)))
+        when(restTemplate.getForObject(anyString(), eq(ActualWeatherAppCity.class)))
                 .thenReturn(createdWeather);
         when(cityRepository.findByNameAndCountryCode(anyString(), any(CountryCode.class)))
                 .thenReturn(Optional.of(new City()));
-        WeatherAppCity weatherReturnedByApp = openWeatherMapService.findByCityAndSaveToDatabase(EXISTING_CITY);
+        ActualWeatherAppCity weatherReturnedByApp = openWeatherMapService.findActualByCityAndSaveToDatabase(EXISTING_CITY);
 
         assertEquals(createdWeather.getName(), weatherReturnedByApp.getName());
         verify(cityRepository).findByNameAndCountryCode(anyString(), any(CountryCode.class));
@@ -74,13 +78,13 @@ public class OpenWeatherMapServiceTest {
     @Test
     @DisplayName("throws error 401")
     public void findByCityAndSaveToDatabase_case3() {
-        when(restTemplate.getForObject(anyString(), eq(WeatherAppCity.class)))
+        when(restTemplate.getForObject(anyString(), eq(ActualWeatherAppCity.class)))
                 .thenThrow(createHttpStatusCodeException(HttpStatus.UNAUTHORIZED));
 
         OpenWeatherMapException openWeatherMapException =
                 assertThrows(
                         OpenWeatherMapException.class,
-                        () -> openWeatherMapService.findByCityAndSaveToDatabase(EXISTING_CITY));
+                        () -> openWeatherMapService.findActualByCityAndSaveToDatabase(EXISTING_CITY));
 
         assertEquals(HttpStatus.UNAUTHORIZED, openWeatherMapException.getErrorCode());
 
@@ -91,13 +95,13 @@ public class OpenWeatherMapServiceTest {
     @Test
     @DisplayName("throws error 404")
     public void findByCityAndSaveToDatabase_case4() {
-        when(restTemplate.getForObject(anyString(), eq(WeatherAppCity.class)))
+        when(restTemplate.getForObject(anyString(), eq(ActualWeatherAppCity.class)))
                 .thenThrow(createHttpStatusCodeException(HttpStatus.NOT_FOUND));
 
         OpenWeatherMapException openWeatherMapException =
                 assertThrows(
                         OpenWeatherMapException.class,
-                        () -> openWeatherMapService.findByCityAndSaveToDatabase(NOT_EXISTING_CITY));
+                        () -> openWeatherMapService.findActualByCityAndSaveToDatabase(NOT_EXISTING_CITY));
 
         assertEquals(HttpStatus.NOT_FOUND, openWeatherMapException.getErrorCode());
 
@@ -108,13 +112,13 @@ public class OpenWeatherMapServiceTest {
     @Test
     @DisplayName("throws error 429")
     public void findByCityAndSaveToDatabase_case5() {
-        when(restTemplate.getForObject(anyString(), eq(WeatherAppCity.class)))
+        when(restTemplate.getForObject(anyString(), eq(ActualWeatherAppCity.class)))
                 .thenThrow(createHttpStatusCodeException(HttpStatus.TOO_MANY_REQUESTS));
 
         OpenWeatherMapException openWeatherMapException =
                 assertThrows(
                         OpenWeatherMapException.class,
-                        () -> openWeatherMapService.findByCityAndSaveToDatabase(NOT_EXISTING_CITY));
+                        () -> openWeatherMapService.findActualByCityAndSaveToDatabase(NOT_EXISTING_CITY));
 
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, openWeatherMapException.getErrorCode());
 
@@ -122,16 +126,16 @@ public class OpenWeatherMapServiceTest {
         verify(cityRepository, times(0)).save(any(City.class));
     }
 
-    private WeatherAppCity createWeatherAppCity(String cityName, CountryCode countryCode) {
-        WeatherAppCity city = new WeatherAppCity();
+    private ActualWeatherAppCity createWeatherAppCity(String cityName, CountryCode countryCode) {
+        ActualWeatherAppCity city = new ActualWeatherAppCity();
         city.setName(cityName);
         city.setSys(createSys(countryCode));
-        city.setCoord(new WeatherAppCity.Coord());
+        city.setCoordinates(createCoordinates(COMMON_LONGITUDE, COMMON_LATITUDE));
         return city;
     }
 
-    private WeatherAppCity.Sys createSys(CountryCode countryCode) {
-        WeatherAppCity.Sys sys = new WeatherAppCity.Sys();
+    private ActualWeatherAppCity.Sys createSys(CountryCode countryCode) {
+        ActualWeatherAppCity.Sys sys = new ActualWeatherAppCity.Sys();
         sys.setCountry(countryCode.name());
         return sys;
     }
@@ -143,6 +147,14 @@ public class OpenWeatherMapServiceTest {
                 return super.getStatusCode();
             }
         };
+    }
+
+    private Coordinates createCoordinates(Double longitude, Double latitude) {
+        Coordinates coordinates = new Coordinates();
+        coordinates.setLongitude(longitude);
+        coordinates.setLatitude(latitude);
+        return coordinates;
+
     }
 
 
