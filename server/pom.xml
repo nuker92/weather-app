@@ -93,14 +93,14 @@
                 <artifactId>heroku-maven-plugin</artifactId>
                 <version>3.0.2</version>
                 <configuration>
-                    <appName>weather-app-go</appName>
+                    <appName>owmWeather-app-go</appName>
                     <processTypes>
                         <web>java -jar -Dserver.port=$PORT target/${project.build.finalName}.jar --openweathermap.api-key=${openweathermap.api}</web>
                     </processTypes>
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>weather-app-server</finalName>
+        <finalName>owmWeather-app-server</finalName>
     </build>
 
 </project>

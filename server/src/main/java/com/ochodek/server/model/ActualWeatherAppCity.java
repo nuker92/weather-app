@@ -12,7 +12,8 @@ public class ActualWeatherAppCity implements Serializable {
 
     @JsonProperty("coord")
     private Coordinates coordinates;
-    private List<Weather> weather;
+    @JsonProperty("weather")
+    private List<OwmWeather> owmWeather;
     @JsonProperty("main")
     private MainWeatherInfo mainWeatherInfo;
     private Long visibility;

@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class OpenWeatherMapServiceTest {
+public class OpenOwmWeatherMapServiceTest {
 
     @Mock
     private RestTemplate restTemplate;
@@ -38,6 +38,7 @@ public class OpenWeatherMapServiceTest {
     OpenWeatherMapService openWeatherMapService;
 
     private static final String EXISTING_CITY = "London";
+    private static final String EXISTING_COUNTRY_CODE = "GB";
     private static final String NOT_EXISTING_CITY = "asdads";
 
     private static final Double COMMON_LONGITUDE = 0D;
@@ -52,7 +53,7 @@ public class OpenWeatherMapServiceTest {
                 .thenReturn(createdWeather);
         when(cityRepository.findByNameAndCountryCode(anyString(), any(CountryCode.class)))
                 .thenReturn(Optional.empty());
-        ActualWeatherAppCity weatherReturnedByApp = openWeatherMapService.findActualByCityAndSaveToDatabase(EXISTING_CITY);
+        ActualWeatherAppCity weatherReturnedByApp = openWeatherMapService.findActualByCityName(EXISTING_CITY, EXISTING_COUNTRY_CODE);
 
         assertEquals(createdWeather.getName(), weatherReturnedByApp.getName());
         verify(cityRepository).findByNameAndCountryCode(anyString(), any(CountryCode.class));
@@ -68,7 +69,7 @@ public class OpenWeatherMapServiceTest {
                 .thenReturn(createdWeather);
         when(cityRepository.findByNameAndCountryCode(anyString(), any(CountryCode.class)))
                 .thenReturn(Optional.of(new City()));
-        ActualWeatherAppCity weatherReturnedByApp = openWeatherMapService.findActualByCityAndSaveToDatabase(EXISTING_CITY);
+        ActualWeatherAppCity weatherReturnedByApp = openWeatherMapService.findActualByCityName(EXISTING_CITY, EXISTING_COUNTRY_CODE);
 
         assertEquals(createdWeather.getName(), weatherReturnedByApp.getName());
         verify(cityRepository).findByNameAndCountryCode(anyString(), any(CountryCode.class));
@@ -84,7 +85,7 @@ public class OpenWeatherMapServiceTest {
         OpenWeatherMapException openWeatherMapException =
                 assertThrows(
                         OpenWeatherMapException.class,
-                        () -> openWeatherMapService.findActualByCityAndSaveToDatabase(EXISTING_CITY));
+                        () -> openWeatherMapService.findActualByCityName(EXISTING_CITY, EXISTING_COUNTRY_CODE));
 
         assertEquals(HttpStatus.UNAUTHORIZED, openWeatherMapException.getErrorCode());
 
@@ -101,7 +102,7 @@ public class OpenWeatherMapServiceTest {
         OpenWeatherMapException openWeatherMapException =
                 assertThrows(
                         OpenWeatherMapException.class,
-                        () -> openWeatherMapService.findActualByCityAndSaveToDatabase(NOT_EXISTING_CITY));
+                        () -> openWeatherMapService.findActualByCityName(NOT_EXISTING_CITY, EXISTING_COUNTRY_CODE));
 
         assertEquals(HttpStatus.NOT_FOUND, openWeatherMapException.getErrorCode());
 
@@ -118,7 +119,7 @@ public class OpenWeatherMapServiceTest {
         OpenWeatherMapException openWeatherMapException =
                 assertThrows(
                         OpenWeatherMapException.class,
-                        () -> openWeatherMapService.findActualByCityAndSaveToDatabase(NOT_EXISTING_CITY));
+                        () -> openWeatherMapService.findActualByCityName(NOT_EXISTING_CITY, EXISTING_COUNTRY_CODE));
 
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, openWeatherMapException.getErrorCode());
 

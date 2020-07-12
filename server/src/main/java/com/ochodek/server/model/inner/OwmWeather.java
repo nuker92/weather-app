@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class Weather implements Serializable {
+public class OwmWeather implements Serializable {
 
     private Long id;
     private String main;

@@ -4,13 +4,14 @@ import com.ochodek.server.model.CountryCode;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
 public class City {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column
     private String name;
@@ -21,5 +22,9 @@ public class City {
     private Double longitude;
     @Column
     private Double latitude;
+
+    @Column
+    @OneToMany(mappedBy = "city")
+    private List<Weather> weathers;
 
 }

@@ -32,7 +32,8 @@ public class ForecastAppCity implements Serializable {
         private Long unixTimestamp;
         @JsonProperty("main")
         private MainWeatherInfo mainWeatherInfo;
-        private Weather weather;
+        @JsonProperty("weather")
+        private OwmWeather owmWeather;
         private Clouds clouds;
         private Wind wind;
         private Rain rain;
