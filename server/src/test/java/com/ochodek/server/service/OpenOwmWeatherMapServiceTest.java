@@ -6,6 +6,7 @@ import com.ochodek.server.model.CountryCode;
 import com.ochodek.server.model.ActualWeatherAppCity;
 import com.ochodek.server.model.inner.Coordinates;
 import com.ochodek.server.repository.CityRepository;
+import com.ochodek.server.repository.WeatherRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,6 +34,9 @@ public class OpenOwmWeatherMapServiceTest {
 
     @Mock
     private CityRepository cityRepository;
+
+    @Mock
+    private WeatherRepository weatherRepository;
 
     @InjectMocks
     @Spy
@@ -132,6 +137,7 @@ public class OpenOwmWeatherMapServiceTest {
         city.setName(cityName);
         city.setSys(createSys(countryCode));
         city.setCoordinates(createCoordinates(COMMON_LONGITUDE, COMMON_LATITUDE));
+        city.setOwmWeather(Collections.emptyList());
         return city;
     }
 
