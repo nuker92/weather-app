@@ -1,11 +1,12 @@
 package com.ochodek.server.service;
 
+import com.ochodek.server.StringUtils;
 import com.ochodek.server.entity.City;
 import com.ochodek.server.exception.MoreThanOneCityWithNameException;
 import com.ochodek.server.exception.NoCityHistoryInDatabaseException;
 import com.ochodek.server.exception.OpenWeatherMapException;
-import com.ochodek.server.model.CountryCode;
 import com.ochodek.server.model.ActualWeatherAppCity;
+import com.ochodek.server.model.CountryCode;
 import com.ochodek.server.model.ForecastAppCity;
 import com.ochodek.server.model.WeatherDao;
 import com.ochodek.server.repository.CityRepository;
@@ -51,14 +52,15 @@ public class OpenWeatherMapService {
     @Cacheable(cacheNames = "actualWeather")
     public ActualWeatherAppCity findActualByCityName(String cityName, String countryCode) {
         String url;
+        String cityNameSimplified = StringUtils.filterDiacriticChars(cityName);
         if (countryCode == null) {
-            url = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", cityName, apiKey);
+            url = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", cityNameSimplified, apiKey);
         } else {
-            url = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s,%s&appid=%s", cityName, countryCode, apiKey);
+            url = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s,%s&appid=%s", cityNameSimplified, countryCode, apiKey);
         }
 
         try {
-            log.info("Requesting openweathermap to get weather in " + cityName);
+            log.info(String.format("Requesting openweathermap to get weather in %s", cityName));
             ActualWeatherAppCity actualWeatherAppCity = restTemplate.getForObject(
                     url,
                     ActualWeatherAppCity.class);
@@ -76,14 +78,15 @@ public class OpenWeatherMapService {
     @Cacheable(cacheNames = "forecast")
     public ForecastAppCity findForecastByCityName(String cityName, String countryCode) {
         String url;
+        String cityNameSimplified = StringUtils.filterDiacriticChars(cityName);
         if (countryCode == null) {
-            url = String.format("https://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s", cityName, apiKey);
+            url = String.format("https://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s", cityNameSimplified, apiKey);
         } else {
-            url = String.format("https://api.openweathermap.org/data/2.5/forecast?q=%s,%s&appid=%s", cityName, countryCode, apiKey);
+            url = String.format("https://api.openweathermap.org/data/2.5/forecast?q=%s,%s&appid=%s", cityNameSimplified, countryCode, apiKey);
         }
 
         try {
-            log.info("Requesting openweathermap to get forecast for " + cityName);
+            log.info(String.format("Requesting openweathermap to get forecast for %s", cityName));
             return restTemplate.getForObject(
                     url,
                     ForecastAppCity.class);

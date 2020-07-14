@@ -13,3 +13,5 @@ target/
 
 
 server/logs/*
+server/database
+server/database/*
