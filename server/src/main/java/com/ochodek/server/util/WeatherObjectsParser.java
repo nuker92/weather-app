@@ -42,8 +42,9 @@ public interface WeatherObjectsParser {
         return weather;
     }
 
-    static WeatherDao parseWeatherToWeatherDao(Weather weather) {
+    static WeatherDao parseWeatherToWeatherDao(String cityName, Weather weather) {
         WeatherDao weatherDao = new WeatherDao();
+        weatherDao.setCityName(cityName);
         weatherDao.setWeatherTime(weather.getWeatherTime());
         weatherDao.setMainInfo(weather.getMainInfo());
         weatherDao.setDescription(weather.getDescription());

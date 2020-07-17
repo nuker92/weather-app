@@ -27,4 +27,8 @@ public class City {
     @OneToMany(mappedBy = "city")
     private List<Weather> weathers;
 
+    @Column
+    @OneToMany(mappedBy = "city")
+    private List<AnotherCityName> anotherCityNames;
+
 }
