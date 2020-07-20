@@ -14,15 +14,15 @@ public interface CityRepository extends JpaRepository<City, Long> {
 
     @Query( "SELECT c " +
             "FROM City c " +
-            "left join c.anotherCityNames a on (c.id = a.city.id) " +
-            "and (c.name = ?1 or a.anotherName = ?1)")
+            "LEFT JOIN c.anotherCityNames a ON (c.id = a.city.id) " +
+            "WHERE (UPPER(c.name) = UPPER(?1) or UPPER(a.anotherName) = UPPER(?1))")
     List<City> findByNameOrAnotherCityName(String name);
 
     @Query( "SELECT c " +
             "FROM City c " +
-            "left join c.anotherCityNames a on (c.id = a.city.id) " +
-            "where c.countryCode = ?1 " +
-            "and (c.name = ?2 or a.anotherName = ?2)")
+            "LEFT JOIN c.anotherCityNames a on (c.id = a.city.id) " +
+            "WHERE c.countryCode = ?1 " +
+            "AND (UPPER(c.name) = UPPER(?2) or UPPER(a.anotherName) = UPPER(?2))")
     Optional<City> findByCountryCodeAndNameOrAnotherCityName(CountryCode countryCode, String name);
 
     Optional<City> findByLongitudeAndLatitude(Double longitude, Double latitude);

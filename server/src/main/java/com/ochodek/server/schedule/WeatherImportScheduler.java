@@ -1,6 +1,7 @@
 package com.ochodek.server.schedule;
 
 import com.ochodek.server.service.OpenWeatherMapService;
+import com.ochodek.server.util.WeatherImportSchedulerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +13,18 @@ public class WeatherImportScheduler {
 
     private final Logger log = LoggerFactory.getLogger(WeatherImportScheduler.class);
 
-    private final OpenWeatherMapService openWeatherMapService;
+    private final WeatherImportSchedulerHelper weatherImportSchedulerHelper;
 
     @Autowired
-    public WeatherImportScheduler(OpenWeatherMapService openWeatherMapService) {
-        this.openWeatherMapService = openWeatherMapService;
+    public WeatherImportScheduler(WeatherImportSchedulerHelper weatherImportSchedulerHelper) {
+        this.weatherImportSchedulerHelper = weatherImportSchedulerHelper;
     }
+
 
     @Scheduled(cron = "0 0 * * * *")
     public void collectWeatherForAllCitiesInDatabase() {
         log.info("********** START SCHEDULER FOR COLLECTING WEATHER FOR ALL CITIES IN DATABASE **********");
-        openWeatherMapService.updateWeatherForAllCitiesInDatabase();
+        weatherImportSchedulerHelper.updateWeatherForAllCitiesInDatabaseViaAllWeatherProviders();
         log.info("********** END SCHEDULER FOR COLLECTING WEATHER FOR ALL CITIES IN DATABASE **********");
     }
 
