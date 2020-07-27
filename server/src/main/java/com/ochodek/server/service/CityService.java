@@ -1,5 +1,6 @@
 package com.ochodek.server.service;
 
+import com.ochodek.server.StringUtils;
 import com.ochodek.server.entity.AnotherCityName;
 import com.ochodek.server.entity.City;
 import com.ochodek.server.exception.MoreThanOneCityWithNameException;
@@ -42,7 +43,7 @@ public class CityService {
 
         if (cityInDatabase.isEmpty()) {
             City city = new City();
-            city.setName(actualWeatherAppCity.getName().toLowerCase());
+            city.setName(StringUtils.filterDiacriticChars(actualWeatherAppCity.getName().toLowerCase()));
             city.setCountryCode(CountryCode.valueOf(actualWeatherAppCity.getSys().getCountry()));
             city.setLongitude(actualWeatherAppCity.getCoordinates().getLongitude());
             city.setLatitude(actualWeatherAppCity.getCoordinates().getLatitude());
