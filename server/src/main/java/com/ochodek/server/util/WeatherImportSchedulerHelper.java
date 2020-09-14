@@ -3,7 +3,6 @@ package com.ochodek.server.util;
 import com.ochodek.server.entity.City;
 import com.ochodek.server.model.SimpleCityModel;
 import com.ochodek.server.service.CityService;
-import com.ochodek.server.service.OpenWeatherMapService;
 import com.ochodek.server.service.WeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

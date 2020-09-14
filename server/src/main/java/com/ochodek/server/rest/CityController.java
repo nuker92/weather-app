@@ -8,6 +8,7 @@ import com.ochodek.server.util.WeatherObjectsParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -71,6 +72,14 @@ public class CityController {
         City city = cityService.findBySimpleCityModel(SimpleCityModel.create(cityName, CountryCode.valueOf(countryCode)));
         return openWeatherMapService.findHistoryForCity(city).stream()
                 .map(weather -> WeatherObjectsParser.parseWeatherToWeatherDao(cityName, weather))
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/cities/find10CityNames")
+    public List<String> find10CityNamesStartsWith(@RequestParam(required = false) String cityStartsWith) {
+        return cityService.findTenCitiesOrderedByName(SimpleCityModel.create(cityStartsWith)).stream()
+                .map(City::getName)
+                .map(name -> Character.toUpperCase(name.charAt(0)) + name.substring(1))
                 .collect(Collectors.toList());
     }
 

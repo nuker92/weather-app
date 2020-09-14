@@ -1,7 +1,6 @@
 package com.ochodek.server.repository;
 
 import com.ochodek.server.entity.City;
-import com.ochodek.server.model.CountryCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -23,8 +22,11 @@ public interface CityRepository extends JpaRepository<City, Long> {
             "LEFT JOIN c.anotherCityNames a on (c.id = a.city.id) " +
             "WHERE c.countryCode = ?1 " +
             "AND (UPPER(c.name) = UPPER(?2) or UPPER(a.anotherName) = UPPER(?2))")
-    Optional<City> findByCountryCodeAndNameOrAnotherCityName(CountryCode countryCode, String name);
+    Optional<City> findByCountryCodeAndNameOrAnotherCityName(String countryCode, String name);
 
     Optional<City> findByLongitudeAndLatitude(Double longitude, Double latitude);
+
+    List<City> findTop10ByOrderByName();
+    List<City> findTop10ByNameStartsWithOrderByName(String name);
 
 }

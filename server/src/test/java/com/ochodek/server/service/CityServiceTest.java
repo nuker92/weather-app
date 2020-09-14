@@ -73,7 +73,7 @@ class CityServiceTest {
         Optional<City> cityInDatabase = cityService.findCityInDatabase(SimpleCityModel.create(EXISTING_CITY_ANOTHER_NAME, EXISTING_COUNTRY_CODE_1), COMMON_LONGITUDE, COMMON_LATITUDE);
         // Then
         assertEquals(EXISTING_CITY, cityInDatabase.get().getName());
-        verify(cityRepository).findByCountryCodeAndNameOrAnotherCityName(eq(EXISTING_COUNTRY_CODE_1), eq(EXISTING_CITY_ANOTHER_NAME));
+        verify(cityRepository).findByCountryCodeAndNameOrAnotherCityName(eq(EXISTING_COUNTRY_CODE_1.name()), eq(EXISTING_CITY_ANOTHER_NAME));
         verify(cityRepository).findByLongitudeAndLatitude(eq(COMMON_LONGITUDE), eq(COMMON_LATITUDE));
         verify(anotherCityRepository).save(any());
 
@@ -120,9 +120,9 @@ class CityServiceTest {
         return cities;
     }
 
-    private City createCity(String name, CountryCode countryCode) {
+    private City createCity(String cityName, CountryCode countryCode) {
         City c = new City();
-        c.setName(name);
+        c.setName(cityName);
         c.setCountryCode(countryCode);
         return c;
     }

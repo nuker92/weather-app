@@ -55,15 +55,15 @@ public class CityService {
     }
 
     public Optional<City> findCityInDatabase(SimpleCityModel simpleCityModel, Double longitude, Double latitude) {
-        return cityRepository.findByCountryCodeAndNameOrAnotherCityName(simpleCityModel.getCountryCode(), simpleCityModel.getCityName())
-                .or(() -> findIfCityExistsByCoordinates(SimpleCityModel.create(simpleCityModel.getCityName()), longitude, latitude));
+        return cityRepository.findByCountryCodeAndNameOrAnotherCityName(simpleCityModel.getCountryCodeAsString(), simpleCityModel.getCityNameAsString())
+                .or(() -> findIfCityExistsByCoordinates(SimpleCityModel.create(simpleCityModel.getCityNameAsString()), longitude, latitude));
     }
 
     private Optional<City> findIfCityExistsByCoordinates(SimpleCityModel simpleCityModel, Double longitude, Double latitude) {
         Optional<City> city = cityRepository.findByLongitudeAndLatitude(longitude, latitude);
         if (city.isPresent()) {
             AnotherCityName anotherCityName = new AnotherCityName();
-            anotherCityName.setAnotherName(simpleCityModel.getCityName());
+            anotherCityName.setAnotherName(simpleCityModel.getCityNameAsString());
             anotherCityName.setCity(city.get());
             anotherCityRepository.save(anotherCityName);
         }
@@ -75,7 +75,7 @@ public class CityService {
     }
 
     public City findBySimpleCityModel(SimpleCityModel simpleCityModel) {
-        return simpleCityModel.getCountryCode() == null ?
+        return simpleCityModel.getCountryCodeAsString() == null ?
                 findOnlyByCityName(simpleCityModel) :
                 findByCityNameAndCountryCode(simpleCityModel);
 
@@ -84,9 +84,9 @@ public class CityService {
     private City findOnlyByCityName(SimpleCityModel simpleCityModel) {
         List<City> cities = cityRepository.findByNameOrAnotherCityName(simpleCityModel.getFilterCityName());
         if (cities.size() == 0) {
-            throw new NoCityHistoryInDatabaseException(simpleCityModel.getCityName());
+            throw new NoCityHistoryInDatabaseException(simpleCityModel.getCityNameAsString());
         } else if (cities.size() != 1) {
-            throw new MoreThanOneCityWithNameException(simpleCityModel.getCityName(), cities.stream()
+            throw new MoreThanOneCityWithNameException(simpleCityModel.getCityNameAsString(), cities.stream()
                     .map(c -> c.getCountryCode().name())
                     .collect(Collectors.toList()));
         }
@@ -94,10 +94,16 @@ public class CityService {
     }
 
     private City findByCityNameAndCountryCode(SimpleCityModel simpleCityModel) {
-        Optional<City> city = cityRepository.findByCountryCodeAndNameOrAnotherCityName(simpleCityModel.getCountryCode(), simpleCityModel.getCityName());
+        Optional<City> city = cityRepository.findByCountryCodeAndNameOrAnotherCityName(simpleCityModel.getCountryCodeAsString(), simpleCityModel.getCityNameAsString());
         if (city.isPresent()) {
             return city.get();
         }
-        throw new NoCityHistoryInDatabaseException(simpleCityModel.getCityName());
+        throw new NoCityHistoryInDatabaseException(simpleCityModel.getCityNameAsString());
+    }
+
+    public List<City> findTenCitiesOrderedByName(SimpleCityModel cityNameStartsWith) {
+        return cityNameStartsWith.getCityNameFormattedForCityTable() == null ?
+                cityRepository.findTop10ByOrderByName() :
+                cityRepository.findTop10ByNameStartsWithOrderByName(cityNameStartsWith.getCityNameFormattedForCityTable());
     }
 }
